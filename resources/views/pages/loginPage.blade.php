@@ -218,6 +218,33 @@
 
         }
 
+        #changePasswordMessage {
+
+            text-align: center;
+
+            font-size: 14px;
+
+            margin-top: 18px;
+
+            min-height: 20px;
+
+            color: #0284c7;
+
+            cursor: pointer;
+
+        }
+        #changePasswordMessage:hover {
+            text-decoration: underline;
+        }
+        #changePasswordMessage a {
+            color: #0284c7;
+            text-decoration: none;
+        }
+        #changePasswordMessage a:hover {
+            text-decoration: underline;
+        }
+
+
 
         /* ================= REGISTER ================= */
 
@@ -366,7 +393,6 @@
 
 
             <!-- Message -->
-
             <div id="message"></div>
 
 

@@ -87,7 +87,7 @@ class UserController extends Controller
 
 
     // DELETE /api/users/{id}
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $user = DB::table('users')->find($id);
 
@@ -140,10 +140,12 @@ class UserController extends Controller
     ], 200);
     }
 
-    public function logout()
-{
+    public function logout(){
     return response()->json([
         'message' => 'Logout successful'
     ], 200);
-}
+    }
+
+
+
 }
