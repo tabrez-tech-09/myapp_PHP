@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
+
 class UserController extends Controller
 {
     // GET /api/users
@@ -146,6 +147,35 @@ class UserController extends Controller
     ], 200);
     }
 
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'old_password' => 'required',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = DB::table('users')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$user || !Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'message' => 'Invalid email or old password'
+            ], 401);
+        }
+
+        DB::table('users')
+            ->where('id', $user->id)
+            ->update([
+                'password' => bcrypt($request->new_password),
+                'updated_at' => now(),
+            ]);
+
+        return response()->json([
+            'message' => 'Password updated successfully'
+        ]);
+    }
 
 
 }

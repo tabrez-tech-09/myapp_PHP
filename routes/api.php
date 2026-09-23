@@ -23,4 +23,7 @@ Route::delete('/users/{id}', [UserController::class, 'destroy']);
 // Login API
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/logout', [UserController::class, 'logout']);
+Route::put('/update-password', [UserController::class, 'updatePassword']);
+
+
 
