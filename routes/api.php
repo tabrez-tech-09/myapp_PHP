@@ -24,6 +24,7 @@ Route::delete('/users/{id}', [UserController::class, 'destroy']);
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/logout', [UserController::class, 'logout']);
 Route::put('/update-password', [UserController::class, 'updatePassword']);
-
+Route::get('/generate-qr-code', [UserController::class, 'generate']);
+Route::post('/payment/verify', [UserController::class, 'verifyPayment']);
 
 

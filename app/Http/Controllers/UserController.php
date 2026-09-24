@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Razorpay\Api\Api;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Razorpay\Api\Errors\SignatureVerificationError;
 
 
 class UserController extends Controller
@@ -177,5 +180,54 @@ class UserController extends Controller
         ]);
     }
 
+   public function generate(Request $request)
+   {
+    $validated = $request->validate([
+        'amount' => ['required', 'numeric', 'min:1'],
+    ]);
+
+    $amount = (float) $validated['amount'];
+
+    $upiUrl = 'upi://pay?'
+        . 'pa=' . urlencode('8271196675@axl')
+        . '&pn=' . urlencode('Tabrez Rabbani')
+        . '&am=' . urlencode(number_format($amount, 2, '.', ''))
+        . '&cu=INR';
+
+    $qr = QrCode::format('svg')->size(250)->generate($upiUrl);
+
+    $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
+    $order = $api->order->create([
+        'receipt' => 'receipt_' . uniqid(),
+        'amount' => (int) round($amount * 100),
+        'currency' => 'INR',
+    ]);
+
+    return view('pages.qrcode', [
+        'amount' => $amount,
+        'qr' => $qr,
+        'order' => $order,
+        'razorpayKey' => config('services.razorpay.key'),
+    ]);
+    }
+
+    public function verifyPayment(Request $request)
+    {
+        $validated = $request->validate([
+            'razorpay_order_id' => ['required', 'string'],
+            'razorpay_payment_id' => ['required', 'string'],
+            'razorpay_signature' => ['required', 'string'],
+        ]);
+
+        try {
+            $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
+            $api->utility->verifyPaymentSignature($validated);
+        } catch (SignatureVerificationError $exception) {
+            return response()->json(['success' => false, 'message' => 'Payment verification failed.'], 422);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Payment successful.']);
+
+    }
 
 }
